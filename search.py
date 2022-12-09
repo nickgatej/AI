@@ -73,67 +73,42 @@ def tinyMazeSearch(problem):
     return  [s, s, w, s, w, w, s, w]
 
 def depthFirstSearch(problem):
-    """
-    Search the deepest nodes in the search tree first.
+    """Search the deepest nodes in the search tree first."""
+    """Search the deepest nodes in the search tree first."""
 
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
+    #states to be explored (LIFO). holds nodes in form (state, action)
+    frontier = util.Stack()
+    #previously explored states (for path checking), holds states
+    exploredNodes = []
+    #define start node
+    startState = problem.getStartState()
+    startNode = (startState, [])
+    
+    frontier.push(startNode)
+    
+    while not frontier.isEmpty():
+        #begin exploring last (most-recently-pushed) node on frontier
+        currentState, actions = frontier.pop()
+        
+        if currentState not in exploredNodes:
+            #mark current node as explored
+            exploredNodes.append(currentState)
 
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
+            if problem.isGoalState(currentState):
+                return actions
+            else:
+                #get list of possible successor nodes in 
+                #form (successor, action, stepCost)
+                successors = problem.getSuccessors(currentState)
+                
+                #push each successor to frontier
+                for succState, succAction, succCost in successors:
+                    newAction = actions + [succAction]
+                    newNode = (succState, newAction)
+                    frontier.push(newNode)
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    """
-    "*** YOUR CODE HERE ***"
-
-    open_stack = util.Stack()
-    # initialize open stack with start position
-    open_stack.push((problem.getStartState(),'origin',0))
-    # define a stack for closed list
-    closed_stack = util.Stack()
-    backtrack_checkpoints = util.Stack()
-    visited_list = []
-
-    while not open_stack.isEmpty():
-        X = open_stack.pop()
-        visited_list.append(X[0])
-        if problem.isGoalState(X[0]):
-            closed_stack.push(X)
-            break
-        else:
-            # generate successors of X
-            children_of_X = problem.getSuccessors(X[0])
-            # push X on closed stack
-            closed_stack.push(X)
-            alreadyVisitedChildren = 0
-            for each_child in children_of_X:
-                if (each_child[0] in visited_list):
-                    alreadyVisitedChildren +=1
-                else:
-                    open_stack.push(each_child)
-
-            if (len(children_of_X) - alreadyVisitedChildren) > 1:
-                backtrack_checkpoints.push(X)
-                if len(children_of_X) == 4:
-                    backtrack_checkpoints.push(X)
-
-            if alreadyVisitedChildren == len(children_of_X):
-                return_point = backtrack_checkpoints.pop()
-                temp_point = closed_stack.pop()
-                while return_point[0] != temp_point[0]:
-                    temp_point = closed_stack.pop()
-                closed_stack.push(temp_point)
-
-    actions = []
-    while not closed_stack.isEmpty():
-        dir = closed_stack.pop()[1]
-        if dir!='origin':
-                actions.append(dir)
-
-    actions.reverse()
-    return actions
+    return actions  
+    
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
